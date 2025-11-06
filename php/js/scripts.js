@@ -4,14 +4,10 @@
 $(document).ready(function() {
     console.log('Scripts.js cargado correctamente');
     
-    // Abrir modal para agregar departamento
+    // Abrir modal para agregar departamento (si existe)
     $('#btnAgregar').click(function() {
-        $('#modalAgregar').show();
-    });
-
-    // Cerrar modales al dar click fuera o en el botón cerrar
-    $('.cerrar').click(function() {
-        $(this).closest('.modal').hide();
+        var modal = new bootstrap.Modal(document.getElementById('modalAgregar'));
+        modal.show();
     });
 
     // AJAX para buscar departamento por folio o CCT
@@ -31,10 +27,12 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(data) {
                 if(data) {
-                    $('#modalComprobante').show();
                     $('#nombre_dep').val(data.nombre_departamento);
                     $('#telefono_dep').val(data.telefono);
                     $('#folio_dep').val(data.folio);
+                    // Abrir modal de Bootstrap
+                    var modalComprobante = new bootstrap.Modal(document.getElementById('modalComprobante'));
+                    modalComprobante.show();
                 } else {
                     alert('No se encontró ningún departamento');
                 }
@@ -244,7 +242,7 @@ $(document).ready(function() {
         }
     }, 100);
 
-    // Modal de confirmación de eliminación
+    // Modal de confirmación de eliminación usando Bootstrap
     $(document).on('click', '.btn-eliminar', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -253,19 +251,9 @@ $(document).ready(function() {
         if (id && nombre) {
             $('#id-eliminar').val(id);
             $('#nombre-eliminar').text(nombre);
-            $('#modalEliminar').addClass('show');
-        }
-    });
-
-    $('#cancelar-eliminar').click(function(e) {
-        e.preventDefault();
-        $('#modalEliminar').removeClass('show');
-    });
-
-    // Cerrar modal al hacer click fuera
-    $(document).on('click', '#modalEliminar', function(e) {
-        if ($(e.target).is('#modalEliminar')) {
-            $('#modalEliminar').removeClass('show');
+            // Abrir modal de Bootstrap
+            var modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'));
+            modalEliminar.show();
         }
     });
 });
