@@ -27,6 +27,7 @@
         <ul class="list-unstyled">
             <li class="mb-3"><a href="?page=consultar" class="text-white text-decoration-none fw-bold">Consultar escuelas</a></li>
             <li class="mb-3"><a href="?page=comprobante" class="text-white text-decoration-none fw-bold">Generar comprobante</a></li>
+            <li class="mb-3"><a href="?page=consulta_comprobante" class="text-white text-decoration-none fw-bold">Consulta de comprobante Telmex</a></li>
         </ul>
     </div>
 
@@ -47,6 +48,8 @@
             include 'consultar.php';
         } elseif ($page == 'comprobante') {
             include 'comprobante.php';
+        } elseif ($page == 'consulta_comprobante') {
+            include 'consulta_comprobante.php';
         } elseif ($page == 'agregar') {
             include 'agregar.php';
         } elseif ($page == 'editar') {
