@@ -44,6 +44,7 @@ p { margin: 0 0 10px 0; color: var(--text); }
     background-color: var(--brand);
     padding: 20px;
     color: white;
+    z-index: 100; /* Menor que el modal para no interferir */
 }
 
 .sidebar h2 { font-size: 0; margin-bottom: 20px; text-align: center; }
@@ -133,7 +134,7 @@ table tr:hover { background: #f1f5f9; }
     padding: 24px 32px;
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    z-index: 2000;
+    z-index: 1020; /* Menor que el modal (1050) para no interferir */
     display: flex;
     align-items: center;
     gap: 16px;
@@ -258,18 +259,61 @@ button:hover, .btn:hover {
     border-bottom: none;
 }
 
-/* Modal */
-#modalAgregar, #modalComprobante {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    z-index: 1000;
+/* Modal Bootstrap - Asegurar que los modales sean interactivos */
+.modal {
+    z-index: 1050;
+}
+
+.modal-backdrop {
+    z-index: 0;
+    background-color: transparent !important;
+}
+
+.modal.show {
+    display: block !important;
+}
+
+.modal-dialog {
+    z-index: 1055;
+    pointer-events: auto;
+}
+
+.modal-content {
+    position: relative;
+    z-index: 1056;
+    pointer-events: auto; /* Habilita clics en el contenido */
+    background-color: #fff;
+}
+
+/* Asegurar que todos los elementos dentro del modal sean clickeables */
+.modal-header,
+.modal-body,
+.modal-footer {
+    pointer-events: auto;
+}
+
+.modal-body input,
+.modal-body select,
+.modal-body textarea,
+.modal-body form,
+.modal-footer button,
+.modal-header button,
+.modal-header .btn-close {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1057;
+    cursor: pointer;
+}
+
+.modal-footer button,
+.modal-header button {
+    cursor: pointer;
+}
+
+/* Asegurar que el backdrop no bloquee interacciones */
+.modal-backdrop.show {
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 #modalEliminar {

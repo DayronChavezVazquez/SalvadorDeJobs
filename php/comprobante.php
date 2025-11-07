@@ -30,6 +30,7 @@
 			<div class="modal-body">
 				<form action="generar_comprobante.php" method="post">
 					<input type="hidden" name="folio" id="folio_dep">
+					<input type="hidden" name="id_departamento" id="id_departamento">
 					<div class="mb-3">
 						<label class="form-label">Nombre Departamento:</label>
 						<input type="text" id="nombre_dep" name="nombre_departamento" class="form-control" readonly>

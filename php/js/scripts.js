@@ -6,14 +6,18 @@ $(document).ready(function() {
     
     // Abrir modal para agregar departamento (si existe)
     $('#btnAgregar').click(function() {
-        var modal = new bootstrap.Modal(document.getElementById('modalAgregar'));
+        var modal = new bootstrap.Modal(document.getElementById('modalAgregar'), {
+            backdrop: false,
+            keyboard: true,
+            focus: true
+        });
         modal.show();
     });
 
     // AJAX para buscar departamento por folio o CCT
     $('#btnBuscar').click(function() {
-        let folio = $('#folio').val();
-        let cct = $('#cct').val();
+        let folio = $('#folio').val().trim();
+        let cct = $('#cct').val().trim();
 
         if(folio == '' && cct == '') {
             alert('Ingresa folio o CCT');
@@ -26,16 +30,47 @@ $(document).ready(function() {
             data: { folio: folio, cct: cct },
             dataType: 'json',
             success: function(data) {
-                if(data) {
-                    $('#nombre_dep').val(data.nombre_departamento);
-                    $('#telefono_dep').val(data.telefono);
-                    $('#folio_dep').val(data.folio);
-                    // Abrir modal de Bootstrap
-                    var modalComprobante = new bootstrap.Modal(document.getElementById('modalComprobante'));
-                    modalComprobante.show();
+                if(data && data.folio) {
+                    $('#nombre_dep').val(data.nombre_departamento || '');
+                    $('#telefono_dep').val(data.telefono || '');
+                    $('#folio_dep').val(data.folio || '');
+                    $('#id_departamento').val(data.id_departamento || '');
+                    
+                    // Obtener el elemento del modal
+                    var modalElement = document.getElementById('modalComprobante');
+                    if (modalElement) {
+                        // Cerrar cualquier modal abierto previamente
+                        var existingModal = bootstrap.Modal.getInstance(modalElement);
+                        if (existingModal) {
+                            existingModal.hide();
+                        }
+                        
+                        // Crear nueva instancia y mostrar
+                        var modalComprobante = new bootstrap.Modal(modalElement, {
+                            backdrop: false,
+                            keyboard: true,
+                            focus: true
+                        });
+                        modalComprobante.show();
+                        
+                        // Asegurar que el modal sea interactivo después de mostrarse
+                        setTimeout(function() {
+                            modalElement.style.pointerEvents = 'auto';
+                            var modalContent = modalElement.querySelector('.modal-content');
+                            if (modalContent) {
+                                modalContent.style.pointerEvents = 'auto';
+                            }
+                        }, 100);
+                    } else {
+                        alert('Error: No se encontró el modal');
+                    }
                 } else {
-                    alert('No se encontró ningún departamento');
+                    alert('No se encontró ningún departamento con esos datos');
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en la búsqueda:', error);
+                alert('Error al buscar el departamento. Por favor, intenta de nuevo.');
             }
         });
     });
@@ -252,7 +287,11 @@ $(document).ready(function() {
             $('#id-eliminar').val(id);
             $('#nombre-eliminar').text(nombre);
             // Abrir modal de Bootstrap
-            var modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'));
+            var modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'), {
+                backdrop: false,
+                keyboard: true,
+                focus: true
+            });
             modalEliminar.show();
         }
     });
