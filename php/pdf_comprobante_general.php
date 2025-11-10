@@ -218,10 +218,10 @@ try {
 
     $columnas = [
         ['titulo' => 'Folio', 'ancho' => 18],
-        ['titulo' => 'Nombre del Departamento', 'ancho' => 150],
+        ['titulo' => 'Nombre del Departamento', 'ancho' => 145],
         ['titulo' => 'Teléfono', 'ancho' => 30],
         ['titulo' => 'CCT', 'ancho' => 35],
-        ['titulo' => 'Total a pagar', 'ancho' => 22]
+        ['titulo' => 'Total a pagar', 'ancho' => 27]
     ];
 
     $pdf->SetX(10);
