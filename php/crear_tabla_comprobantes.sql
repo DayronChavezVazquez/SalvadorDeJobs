@@ -32,3 +32,4 @@ CREATE TABLE IF NOT EXISTS `comprobantes` (
 -- crear dos comprobantes para el mismo departamento, mes y año.
 
 
+

@@ -9,7 +9,7 @@ $folio_interno = $_POST['folio_interno'] ?? '';
 $nombre_encargado = $_POST['nombre_encargado'] ?? '';
 $cargo = $_POST['cargo'] ?? '';
 $domicilio = $_POST['domicilio'] ?? '';
-$cct = $_POST['cct'] ?? '';
+$cct = isset($_POST['cct']) ? strtoupper(trim($_POST['cct'])) : '';
 
 $stmt = $conn->prepare("UPDATE ct_departamentos SET 
     nombre_departamento = :nombre,

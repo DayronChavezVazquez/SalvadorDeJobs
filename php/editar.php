@@ -20,7 +20,8 @@ if (!$dep) { echo '<p>No encontrado</p>'; return; }
 			</div>
 			<div class="mb-3">
 				<label class="form-label">Teléfono</label>
-				<input type="text" name="telefono" class="form-control" value="<?= htmlspecialchars((string)($dep['telefono'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+				<input type="text" name="telefono" id="telefono_editar" class="form-control" value="<?= htmlspecialchars((string)($dep['telefono'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" maxlength="10">
+				<small class="text-muted">Máximo 10 dígitos</small>
 			</div>
 			<div class="row">
 				<div class="col-md-6 mb-3">
@@ -48,7 +49,7 @@ if (!$dep) { echo '<p>No encontrado</p>'; return; }
 			</div>
 			<div class="mb-3">
 				<label class="form-label">CCT</label>
-				<input type="text" name="cct" class="form-control" value="<?= htmlspecialchars((string)($dep['cct'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+				<input type="text" name="cct" id="cct_editar" class="form-control" value="<?= htmlspecialchars((string)($dep['cct'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
 			</div>
 			<div class="form-actions">
 				<button type="submit" class="btn btn-primary">Guardar cambios</button>
@@ -57,5 +58,23 @@ if (!$dep) { echo '<p>No encontrado</p>'; return; }
 		</form>
 	</div>
 </div>
+
+<script>
+$(document).ready(function() {
+	// Convertir CCT a mayúsculas automáticamente
+	$('#cct_editar').on('input', function() {
+		$(this).val($(this).val().toUpperCase());
+	});
+	
+	// Limitar teléfono a solo números y máximo 10 dígitos
+	$('#telefono_editar').on('input', function() {
+		var valor = $(this).val().replace(/\D/g, ''); // Solo números
+		if (valor.length > 10) {
+			valor = valor.substring(0, 10);
+		}
+		$(this).val(valor);
+	});
+});
+</script>
 
 

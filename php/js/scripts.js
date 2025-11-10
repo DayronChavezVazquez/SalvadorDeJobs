@@ -14,10 +14,15 @@ $(document).ready(function() {
         modal.show();
     });
 
+    // Convertir CCT a mayúsculas automáticamente en el campo de búsqueda
+    $(document).on('input', '#cct', function() {
+        $(this).val($(this).val().toUpperCase());
+    });
+    
     // AJAX para buscar departamento por folio o CCT
     $('#btnBuscar').click(function() {
         let folio = $('#folio').val().trim();
-        let cct = $('#cct').val().trim();
+        let cct = $('#cct').val().trim().toUpperCase();
 
         if(folio == '' && cct == '') {
             alert('Ingresa folio o CCT');

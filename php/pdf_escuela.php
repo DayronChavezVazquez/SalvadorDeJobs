@@ -402,8 +402,19 @@ try {
     // ============================================
     // GENERAR Y ENVIAR EL PDF
     // ============================================
-    // Nombre del archivo
-    $nombre_archivo = 'comprobante_' . $departamento['folio'] . '_' . $comprobante['mes_pago'] . '_' . $comprobante['año_pago'] . '.pdf';
+    // Nombre del archivo usando el nombre del departamento
+    $nombre_departamento_original = $departamento['nombre_departamento'] ?? 'departamento';
+    // Convertir a formato compatible con nombres de archivo
+    $nombre_departamento_limpio = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nombre_departamento_original);
+    $nombre_departamento_limpio = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $nombre_departamento_limpio);
+    $nombre_departamento_limpio = preg_replace('/_+/', '_', $nombre_departamento_limpio); // Reemplazar múltiples guiones bajos
+    $nombre_departamento_limpio = trim($nombre_departamento_limpio, '_'); // Eliminar guiones bajos al inicio y final
+    $nombre_departamento_limpio = mb_substr($nombre_departamento_limpio, 0, 50); // Limitar a 50 caracteres
+    if (empty($nombre_departamento_limpio)) {
+        $nombre_departamento_limpio = 'departamento';
+    }
+    $mes_limpio = preg_replace('/[^a-zA-Z0-9_\-]/', '_', strtolower($comprobante['mes_pago']));
+    $nombre_archivo = 'comprobante_' . $nombre_departamento_limpio . '_' . $mes_limpio . '_' . $comprobante['año_pago'] . '.pdf';
     
     // Enviar el PDF para descarga automática
     $pdf->Output('D', $nombre_archivo); // 'D' = descargar automáticamente
