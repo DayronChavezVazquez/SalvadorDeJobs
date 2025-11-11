@@ -25,7 +25,10 @@
 					<label class="form-label">Año:</label>
                     <select name="anio" id="anio" class="form-select" required>
                         <option value="">Selecciona año</option>
-                        <?php for($a=2025; $a<=2040; $a++) echo "<option value='$a'>$a</option>"; ?>
+                        <?php 
+                        $anio_actual = (int)date('Y');
+                        echo "<option value='$anio_actual' selected>$anio_actual</option>";
+                        ?>
                     </select>
 				</div>
 			</div>

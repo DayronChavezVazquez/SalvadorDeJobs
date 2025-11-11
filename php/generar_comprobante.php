@@ -47,33 +47,50 @@ try {
         exit;
     }
     
-    // Insertar el comprobante en la base de datos (tabla Pagos)
-    $stmt = $conn->prepare("INSERT INTO Pagos 
-        (id_departamento, mes_pago, año_pago, total_pagar, nombre_firmante, cargo_firmante) 
-        VALUES (:id_departamento, :mes, :anio, :cantidad, :nombre_firmante, :puesto_firmante)");
+    // Iniciar transacción
+    $conn->beginTransaction();
     
-    $stmt->execute([
-        ':id_departamento' => $id_departamento,
-        ':mes' => $mes,
-        ':anio' => $anio,
-        ':cantidad' => $cantidad,
-        ':nombre_firmante' => $nombre_firmante,
-        ':puesto_firmante' => $puesto_firmante
-    ]);
-    
-    // Obtener el ID del comprobante recién creado
-    $id_pago = $conn->lastInsertId();
-    
-    // Redirigir a la generación del PDF con los datos necesarios
-    $params = http_build_query([
-        'id_pago' => $id_pago,
-        'id_departamento' => $id_departamento
-    ]);
-    
-    header("Location: pdf_escuela.php?$params");
-    exit;
+    try {
+        // Insertar el comprobante en la base de datos (tabla Pagos)
+        $stmt = $conn->prepare("INSERT INTO Pagos 
+            (id_departamento, mes_pago, año_pago, total_pagar, nombre_firmante, cargo_firmante) 
+            VALUES (:id_departamento, :mes, :anio, :cantidad, :nombre_firmante, :puesto_firmante)");
+        
+        $stmt->execute([
+            ':id_departamento' => $id_departamento,
+            ':mes' => $mes,
+            ':anio' => $anio,
+            ':cantidad' => $cantidad,
+            ':nombre_firmante' => $nombre_firmante,
+            ':puesto_firmante' => $puesto_firmante
+        ]);
+        
+        // Obtener el ID del comprobante recién creado
+        $id_pago = $conn->lastInsertId();
+        
+        // Confirmar transacción
+        $conn->commit();
+        
+        // Redirigir a la generación del PDF con los datos necesarios
+        $params = http_build_query([
+            'id_pago' => $id_pago,
+            'id_departamento' => $id_departamento
+        ]);
+        
+        header("Location: pdf_escuela.php?$params");
+        exit;
+        
+    } catch (PDOException $e) {
+        // Revertir transacción en caso de error
+        $conn->rollBack();
+        throw $e; // Re-lanzar la excepción para que sea capturada por el catch externo
+    }
     
 } catch (PDOException $e) {
+    // Si hay una transacción activa, revertirla
+    if ($conn->inTransaction()) {
+        $conn->rollBack();
+    }
     echo "<script>alert('Error al guardar el comprobante: " . addslashes($e->getMessage()) . "'); window.location='index.php?page=comprobante';</script>";
     exit;
 }

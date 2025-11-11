@@ -67,27 +67,44 @@ try {
         exit;
     }
     
-    // Insertar en la base (id_departamento es auto_increment)
-    $stmt = $conn->prepare("INSERT INTO ct_departamentos 
-        (nombre_departamento, telefono, folio, folio_interno, nombre_encargado, cargo, domicilio, cct)
-        VALUES (:nombre, :telefono, :folio, :folio_interno, :nombre_encargado, :cargo, :domicilio, :cct)");
+    // Iniciar transacción
+    $conn->beginTransaction();
+    
+    try {
+        // Insertar en la base (id_departamento es auto_increment)
+        $stmt = $conn->prepare("INSERT INTO ct_departamentos 
+            (nombre_departamento, telefono, folio, folio_interno, nombre_encargado, cargo, domicilio, cct)
+            VALUES (:nombre, :telefono, :folio, :folio_interno, :nombre_encargado, :cargo, :domicilio, :cct)");
 
-    $stmt->execute([
-        ':nombre' => $nombre,
-        ':telefono' => $telefono,
-        ':folio' => $folio,
-        ':folio_interno' => $folio_interno,
-        ':nombre_encargado' => $nombre_encargado,
-        ':cargo' => $cargo,
-        ':domicilio' => $domicilio,
-        ':cct' => $cct
-    ]);
+        $stmt->execute([
+            ':nombre' => $nombre,
+            ':telefono' => $telefono,
+            ':folio' => $folio,
+            ':folio_interno' => $folio_interno,
+            ':nombre_encargado' => $nombre_encargado,
+            ':cargo' => $cargo,
+            ':domicilio' => $domicilio,
+            ':cct' => $cct
+        ]);
 
-    // Redirigir de nuevo a consultar con bandera de éxito para mostrar toast
-    header("Location: index.php?page=consultar&saved=1");
-    exit;
+        // Confirmar transacción
+        $conn->commit();
+
+        // Redirigir de nuevo a consultar con bandera de éxito para mostrar toast
+        header("Location: index.php?page=consultar&saved=1");
+        exit;
+        
+    } catch (PDOException $e) {
+        // Revertir transacción en caso de error
+        $conn->rollBack();
+        throw $e; // Re-lanzar la excepción para que sea capturada por el catch externo
+    }
     
 } catch (PDOException $e) {
+    // Si hay una transacción activa, revertirla
+    if ($conn->inTransaction()) {
+        $conn->rollBack();
+    }
     echo "<script>
         alert('Error al guardar el departamento: " . addslashes($e->getMessage()) . "');
         window.history.back();

@@ -29,10 +29,10 @@ include 'conexion_base.php'; // Incluimos la conexión
     <div class="sidebar">
         <h2><img src="imagenes/florColor2.png" alt="Telmex logo" class="logo-lateral"></h2>
         <ul class="list-unstyled">
-            <li class="mb-3"><a href="?page=consultar" class="text-white text-decoration-none fw-bold">Consultar escuelas</a></li>
-            <li class="mb-3"><a href="?page=comprobante" class="text-white text-decoration-none fw-bold">Generar comprobante</a></li>
-            <li class="mb-3"><a href="?page=consulta_comprobante" class="text-white text-decoration-none fw-bold">Consulta de comprobante Telmex</a></li>
-            <li class="mb-3"><a href="?page=consulta_comprobante_general" class="text-white text-decoration-none fw-bold">Consulta de comprobante general</a></li>
+            <li class="mb-3"><a href="?page=consultar" class="text-white text-decoration-none fw-bold menu-link" data-page="consultar">Consultar escuelas</a></li>
+            <li class="mb-3"><a href="?page=comprobante" class="text-white text-decoration-none fw-bold menu-link" data-page="comprobante">Generar comprobante</a></li>
+            <li class="mb-3"><a href="?page=consulta_comprobante" class="text-white text-decoration-none fw-bold menu-link" data-page="consulta_comprobante">Consulta de comprobante Telmex</a></li>
+            <li class="mb-3"><a href="?page=consulta_comprobante_general" class="text-white text-decoration-none fw-bold menu-link" data-page="consulta_comprobante_general">Consulta de comprobante general</a></li>
         </ul>
     </div>
 
@@ -124,6 +124,13 @@ include 'conexion_base.php'; // Incluimos la conexión
     <script src="js/scripts.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+    // Resaltar la opción del menú activa
+    $(document).ready(function() {
+        var currentPage = new URLSearchParams(window.location.search).get('page') || 'consultar';
+        $('.menu-link[data-page="' + currentPage + '"]').addClass('active');
+    });
+    </script>
 </body>
 
 </html>
