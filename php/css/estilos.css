@@ -29,10 +29,26 @@ p { margin: 0 0 10px 0; color: var(--text); }
     align-items: center;
     justify-content: center;
     box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+
+    /* 🔹 Ajustes para mantener la barra fija */
+    position: fixed;   /* La mantiene visible al hacer scroll */
+    top: 0;            /* Fija al borde superior */
+    left: 0;
+    width: 100%;       /* Que ocupe todo el ancho */
+    z-index: 1000;     /* Para que quede por encima del contenido */
 }
 
-/* Tamaño del logo superior (SEPE_USET). Ajusta el width para hacerlo más grande/pequeño */
-.topbar .logo-superior { width: 320px; height: auto; }
+/* Tamaño del logo superior (SEPE_USET) */
+.topbar .logo-superior {
+    width: 320px;
+    height: auto;
+}
+
+/* 🔹 Añade esto al contenido principal de tu página */
+body {
+    margin: 0; /* Evita espacio extra arriba */
+    padding-top: 80px; /* Espacio para que el contenido no quede oculto bajo la barra */
+}
 
 /* Sidebar lateral */
 .sidebar {

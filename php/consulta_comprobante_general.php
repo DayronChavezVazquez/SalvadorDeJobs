@@ -21,9 +21,13 @@
                     <select name="anio" id="anio_general" class="form-select" required>
                         <option value="">Selecciona año</option>
                         <?php 
-                        $anio_actual = (int)date('Y');
-                        echo "<option value='$anio_actual' selected>$anio_actual</option>";
-                        ?>
+                          $anio_actual = (int)date('Y');
+                         $anio_inicio = $anio_actual - 1; // últimos 5 años incluyendo el actual
+                        for ($anio = $anio_actual; $anio >= $anio_inicio; $anio--) {
+                        $selected = ($anio === $anio_actual) ? 'selected' : '';
+                        echo "<option value='$anio' $selected>$anio</option>";
+        }
+        ?>
                     </select>
                 </div>
             </div>

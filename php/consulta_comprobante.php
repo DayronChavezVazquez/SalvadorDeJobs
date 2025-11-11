@@ -22,15 +22,20 @@
 					</select>
 				</div>
 				<div class="col-md-4">
-					<label class="form-label">Año:</label>
-                    <select name="anio" id="anio" class="form-select" required>
-                        <option value="">Selecciona año</option>
-                        <?php 
-                        $anio_actual = (int)date('Y');
-                        echo "<option value='$anio_actual' selected>$anio_actual</option>";
-                        ?>
-                    </select>
-				</div>
+    <label class="form-label">Año:</label>
+    <select name="anio" id="anio" class="form-select" required>
+        <option value="">Selecciona año</option>
+        <?php 
+        $anio_actual = (int)date('Y');
+        $anio_inicio = $anio_actual - 1; // últimos 5 años incluyendo el actual
+        for ($anio = $anio_actual; $anio >= $anio_inicio; $anio--) {
+            $selected = ($anio === $anio_actual) ? 'selected' : '';
+            echo "<option value='$anio' $selected>$anio</option>";
+        }
+        ?>
+    </select>
+</div>
+
 			</div>
 			<button type="submit" class="btn btn-primary">Buscar</button>
 		</form>
