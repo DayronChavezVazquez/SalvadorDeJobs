@@ -7,11 +7,19 @@
 	<div class="card-body">
 		<form id="formBuscarComprobante" method="post" action="buscar_comprobante.php">
 			<div class="row g-3 mb-4">
-				<div class="col-md-4">
-					<label class="form-label">Teléfono:</label>
-					<input type="text" name="telefono" id="telefono" class="form-control" placeholder="Teléfono" required>
+				<div class="col-md-3">
+					<label class="form-label">Buscar por:</label>
+					<select name="tipo_busqueda" id="tipo_busqueda" class="form-select" required>
+						<option value="telefono">Teléfono</option>
+						<option value="cct">CCT</option>
+					</select>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-3">
+					<label class="form-label" id="label_busqueda">Teléfono:</label>
+					<input type="text" name="telefono" id="telefono" class="form-control" placeholder="Teléfono" required>
+					<input type="text" name="cct" id="cct" class="form-control" placeholder="CCT" style="display: none;">
+				</div>
+				<div class="col-md-3">
 					<label class="form-label">Mes:</label>
 					<select name="mes" id="mes" class="form-select" required>
 						<option value="">Selecciona mes</option>
@@ -21,20 +29,12 @@
 						?>
 					</select>
 				</div>
-				<div class="col-md-4">
-    <label class="form-label">Año:</label>
-    <select name="anio" id="anio" class="form-select" required>
-        <option value="">Selecciona año</option>
-        <?php 
-        $anio_actual = (int)date('Y');
-        $anio_inicio = $anio_actual - 1; // últimos 5 años incluyendo el actual
-        for ($anio = $anio_actual; $anio >= $anio_inicio; $anio--) {
-            $selected = ($anio === $anio_actual) ? 'selected' : '';
-            echo "<option value='$anio' $selected>$anio</option>";
-        }
-        ?>
-    </select>
-</div>
+				<div class="col-md-3">
+					<label class="form-label">Año:</label>
+					<select name="anio" id="anio" class="form-select" required>
+						<option value="">Cargando años...</option>
+					</select>
+				</div>
 
 			</div>
 			<button type="submit" class="btn btn-primary">Buscar</button>
@@ -50,9 +50,56 @@
 
 <script>
 $(document).ready(function() {
+	// Cargar años disponibles dinámicamente
+	function cargarAniosDisponibles() {
+		$.ajax({
+			url: 'obtener_anios_disponibles.php',
+			type: 'GET',
+			dataType: 'json',
+			success: function(response) {
+				if (response.success && response.anios) {
+					var selectAnio = $('#anio');
+					selectAnio.html('<option value="">Selecciona año</option>');
+					
+					response.anios.forEach(function(anio) {
+						var selected = (anio === response.anio_actual) ? 'selected' : '';
+						selectAnio.append('<option value="' + anio + '" ' + selected + '>' + anio + '</option>');
+					});
+				} else {
+					// Fallback: solo año actual
+					var anio_actual = new Date().getFullYear();
+					$('#anio').html('<option value="">Selecciona año</option><option value="' + anio_actual + '" selected>' + anio_actual + '</option>');
+				}
+			},
+			error: function() {
+				// Fallback: solo año actual
+				var anio_actual = new Date().getFullYear();
+				$('#anio').html('<option value="">Selecciona año</option><option value="' + anio_actual + '" selected>' + anio_actual + '</option>');
+			}
+		});
+	}
+	
+	// Cargar años al iniciar
+	cargarAniosDisponibles();
+	
+	// Manejar cambio de tipo de búsqueda
+	$('#tipo_busqueda').on('change', function() {
+		var tipo = $(this).val();
+		if (tipo === 'telefono') {
+			$('#label_busqueda').text('Teléfono:');
+			$('#telefono').show().prop('required', true);
+			$('#cct').hide().prop('required', false).val('');
+		} else if (tipo === 'cct') {
+			$('#label_busqueda').text('CCT:');
+			$('#telefono').hide().prop('required', false).val('');
+			$('#cct').show().prop('required', true);
+		}
+	});
+	
 	// Función para limpiar el formulario y ocultar resultados
 	function limpiarFormulario() {
 		$('#telefono').val('');
+		$('#cct').val('');
 		$('#mes').val('');
 		$('#anio').val('');
 		$('#resultadoBusqueda').hide().html('');
@@ -86,7 +133,16 @@ $(document).ready(function() {
 	$('#formBuscarComprobante').on('submit', function(e) {
 		e.preventDefault();
 		
+		// Asegurar que solo se envíe el campo correspondiente
+		var tipoBusqueda = $('#tipo_busqueda').val();
 		var formData = $(this).serialize();
+		
+		// Si es búsqueda por CCT, remover el campo telefono del formData
+		if (tipoBusqueda === 'cct') {
+			formData = formData.replace(/telefono=[^&]*&?/g, '');
+		} else {
+			formData = formData.replace(/cct=[^&]*&?/g, '');
+		}
 		
 		$.ajax({
 			url: 'buscar_comprobante.php',
@@ -175,9 +231,15 @@ $(document).ready(function() {
 						$('#resultadoBusqueda').html(html).show();
 					}
 				} else {
-					// Verificar si es el error de teléfono no encontrado
-					if (response.message && (response.message.includes('teléfono') || response.message.includes('telefono') || response.message.includes('No se encontró'))) {
-						mostrarAlertaTemporal('Ese número no se encuentra registrado', 'danger');
+					// Verificar si es el error de teléfono o CCT no encontrado
+					if (response.message && (response.message.includes('teléfono') || response.message.includes('telefono') || response.message.includes('CCT') || response.message.includes('No se encontró'))) {
+						var mensajeError = 'No se encuentra registrado';
+						if (response.message.includes('CCT')) {
+							mensajeError = 'Ese CCT no se encuentra registrado';
+						} else if (response.message.includes('teléfono') || response.message.includes('telefono')) {
+							mensajeError = 'Ese número no se encuentra registrado';
+						}
+						mostrarAlertaTemporal(mensajeError, 'danger');
 					} else {
 						// Mostrar otros errores
 						var html = '<div class="alert alert-danger mt-4" role="alert">' + response.message + '</div>';

@@ -12,11 +12,12 @@ include 'conexion_base.php';
 
 // Obtener parámetros
 $telefono = isset($_POST['telefono']) ? trim($_POST['telefono']) : '';
+$cct = isset($_POST['cct']) ? trim($_POST['cct']) : '';
 $mes = isset($_POST['mes']) ? trim($_POST['mes']) : '';
 $anio = isset($_POST['anio']) ? trim($_POST['anio']) : '';
 
 // Validar que todos los parámetros estén presentes
-if (empty($telefono) || empty($mes) || empty($anio)) {
+if ((empty($telefono) && empty($cct)) || empty($mes) || empty($anio)) {
     echo json_encode([
         'success' => false,
         'message' => 'Todos los campos son requeridos'
@@ -25,17 +26,35 @@ if (empty($telefono) || empty($mes) || empty($anio)) {
 }
 
 try {
-    // Buscar el departamento por teléfono
-    $stmt_dept = $conn->prepare("SELECT * FROM ct_departamentos WHERE telefono = :telefono LIMIT 1");
-    $stmt_dept->execute([':telefono' => $telefono]);
-    $departamento = $stmt_dept->fetch(PDO::FETCH_ASSOC);
+    // Buscar el departamento por teléfono o CCT
+    $departamento = null;
     
-    if (!$departamento) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'No se encontró ningún departamento con ese teléfono'
-        ]);
-        exit;
+    if (!empty($telefono)) {
+        // Búsqueda por teléfono
+        $stmt_dept = $conn->prepare("SELECT * FROM ct_departamentos WHERE telefono = :telefono LIMIT 1");
+        $stmt_dept->execute([':telefono' => $telefono]);
+        $departamento = $stmt_dept->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$departamento) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No se encontró ningún departamento con ese teléfono'
+            ]);
+            exit;
+        }
+    } else if (!empty($cct)) {
+        // Búsqueda por CCT
+        $stmt_dept = $conn->prepare("SELECT * FROM ct_departamentos WHERE cct = :cct LIMIT 1");
+        $stmt_dept->execute([':cct' => $cct]);
+        $departamento = $stmt_dept->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$departamento) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No se encontró ningún departamento con ese CCT'
+            ]);
+            exit;
+        }
     }
     
     // Buscar el comprobante por id_departamento, mes y año

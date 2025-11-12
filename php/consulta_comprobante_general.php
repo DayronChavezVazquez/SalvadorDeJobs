@@ -19,15 +19,7 @@
                 <div class="col-md-6">
                     <label class="form-label">Año:</label>
                     <select name="anio" id="anio_general" class="form-select" required>
-                        <option value="">Selecciona año</option>
-                        <?php 
-                          $anio_actual = (int)date('Y');
-                         $anio_inicio = $anio_actual - 1; // últimos 5 años incluyendo el actual
-                        for ($anio = $anio_actual; $anio >= $anio_inicio; $anio--) {
-                        $selected = ($anio === $anio_actual) ? 'selected' : '';
-                        echo "<option value='$anio' $selected>$anio</option>";
-        }
-        ?>
+                        <option value="">Cargando años...</option>
                     </select>
                 </div>
             </div>
@@ -42,6 +34,38 @@
 
 <script>
 $(document).ready(function() {
+    // Cargar años disponibles dinámicamente
+    function cargarAniosDisponibles() {
+        $.ajax({
+            url: 'obtener_anios_disponibles.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success && response.anios) {
+                    var selectAnio = $('#anio_general');
+                    selectAnio.html('<option value="">Selecciona año</option>');
+                    
+                    response.anios.forEach(function(anio) {
+                        var selected = (anio === response.anio_actual) ? 'selected' : '';
+                        selectAnio.append('<option value="' + anio + '" ' + selected + '>' + anio + '</option>');
+                    });
+                } else {
+                    // Fallback: solo año actual
+                    var anio_actual = new Date().getFullYear();
+                    $('#anio_general').html('<option value="">Selecciona año</option><option value="' + anio_actual + '" selected>' + anio_actual + '</option>');
+                }
+            },
+            error: function() {
+                // Fallback: solo año actual
+                var anio_actual = new Date().getFullYear();
+                $('#anio_general').html('<option value="">Selecciona año</option><option value="' + anio_actual + '" selected>' + anio_actual + '</option>');
+            }
+        });
+    }
+    
+    // Cargar años al iniciar
+    cargarAniosDisponibles();
+    
     function mostrarAlertaTemporalGeneral(mensaje, tipo) {
         tipo = tipo || 'warning';
         var bgColor = tipo === 'danger' ? '#dc3545' : '#17a2b8';
