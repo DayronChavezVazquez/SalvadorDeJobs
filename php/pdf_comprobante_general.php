@@ -196,12 +196,18 @@ try {
     $imagen_izq = __DIR__ . '/imagenes/sepe_uset.png';
     $imagen_der = __DIR__ . '/imagenes/nueva_historia.png';
 
+    // Posiciones verticales: sepe_uset.png un poco más abajo
+    $y_sepe = 15;  // Bajada de 10 a 15mm
+    $y_historia = 10;  // Mantiene su posición original
+
     if (file_exists($imagen_izq)) {
-        $pdf->Image($imagen_izq, 10, 10, 50, 0);
+        // Imagen izquierda más grande: ancho aumentado de 50 a 70mm, bajada un poco
+        $pdf->Image($imagen_izq, 10, $y_sepe, 70, 0);
     }
 
     if (file_exists($imagen_der)) {
-        $pdf->Image($imagen_der, 230, 10, 40, 0);
+        // Imagen derecha mantiene su posición original
+        $pdf->Image($imagen_der, 230, $y_historia, 40, 0);
     }
 
     $pdf->SetFont('Arial', 'B', 18);

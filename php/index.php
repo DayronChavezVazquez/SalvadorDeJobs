@@ -1,8 +1,32 @@
 <?php 
+/**
+ * ============================================
+ * index.php - PÁGINA PRINCIPAL Y ROUTER
+ * ============================================
+ * 
+ * Este archivo es el punto de entrada principal de la aplicación.
+ * Funciona como un "router" que decide qué página mostrar según
+ * el parámetro 'page' en la URL.
+ * 
+ * ¿CÓMO FUNCIONA?
+ * - Si visitas: index.php?page=consultar → muestra consultar.php
+ * - Si visitas: index.php?page=comprobante → muestra comprobante.php
+ * - Si no especificas 'page', muestra 'consultar' por defecto
+ * 
+ * ¿QUÉ MODIFICAR AQUÍ?
+ * - Para agregar una nueva página: añade un nuevo 'elseif' en la línea 107
+ * - Para cambiar la página por defecto: modifica la línea 107
+ * - Para agregar un nuevo menú: añade un <li> en la línea 31-35
+ */
+
+// Iniciar sesión PHP (necesario para mantener datos entre páginas)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'conexion_base.php'; // Incluimos la conexión 
+
+// Incluir el archivo de conexión a la base de datos
+// Este archivo contiene la configuración para conectarse a MySQL
+include 'conexion_base.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -104,20 +128,49 @@ include 'conexion_base.php'; // Incluimos la conexión
         }
         </script>
         <?php
-        $page = $_GET['page'] ?? 'consultar'; // Por defecto mostrar consultar
+        /**
+         * ============================================
+         * SISTEMA DE ROUTING (ENRUTAMIENTO)
+         * ============================================
+         * 
+         * Aquí se decide qué archivo PHP mostrar según la URL.
+         * 
+         * CÓMO AGREGAR UNA NUEVA PÁGINA:
+         * 1. Crea tu archivo PHP (ej: mi_nueva_pagina.php)
+         * 2. Agrega un elseif aquí: elseif ($page == 'mi_nueva_pagina')
+         * 3. Agrega el enlace en el menú lateral (línea 31-35)
+         * 
+         * EJEMPLO:
+         * elseif ($page == 'mi_nueva_pagina') {
+         *     include 'mi_nueva_pagina.php';
+         * }
+         */
+        
+        // Obtener el parámetro 'page' de la URL, si no existe usar 'consultar' por defecto
+        // Ejemplo: index.php?page=comprobante → $page = 'comprobante'
+        $page = $_GET['page'] ?? 'consultar';
+        
+        // Decidir qué archivo incluir según el valor de $page
         if ($page == 'consultar') {
+            // Muestra la lista de departamentos/escuelas
             include 'consultar.php';
         } elseif ($page == 'comprobante') {
+            // Muestra el formulario para generar un comprobante individual
             include 'comprobante.php';
         } elseif ($page == 'consulta_comprobante') {
+            // Muestra el formulario para consultar un comprobante por teléfono/CCT
             include 'consulta_comprobante.php';
         } elseif ($page == 'consulta_comprobante_general') {
+            // Muestra el formulario para consultar todos los comprobantes de un período
             include 'consulta_comprobante_general.php';
         } elseif ($page == 'agregar') {
+            // Muestra el formulario para agregar un nuevo departamento
             include 'agregar.php';
         } elseif ($page == 'editar') {
+            // Muestra el formulario para editar un departamento existente
             include 'editar.php';
         }
+        // Si quieres agregar más páginas, añade más 'elseif' aquí
         ?>
     </div>
 
